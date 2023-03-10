@@ -19,7 +19,6 @@ cd {{your_project}}
 
 #### Run the project
 ```
-Copy code
 ./gradlew bootRun
 ```
 
