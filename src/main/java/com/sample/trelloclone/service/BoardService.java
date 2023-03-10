@@ -2,6 +2,8 @@ package com.sample.trelloclone.service;
 
 
 import com.sample.trelloclone.dto.BoardDto;
+import com.sample.trelloclone.entity.Board;
+import com.sample.trelloclone.exception.BoardNotFoundException;
 import com.sample.trelloclone.mapper.BoardMapper;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +22,12 @@ public class BoardService {
     }
 
     public Optional<BoardDto> getBoard() {
-        return dataService
-                .getBoard()
+        Optional<Board> board = dataService
+                .getBoard();
+        if (board.isEmpty()) {
+            throw new BoardNotFoundException();
+        }
+        return board
                 .map(boardMapper::toDto);
 
     }
