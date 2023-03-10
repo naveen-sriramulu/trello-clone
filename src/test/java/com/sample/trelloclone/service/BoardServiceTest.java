@@ -6,6 +6,8 @@ import com.sample.trelloclone.entity.Board;
 import com.sample.trelloclone.entity.Card;
 import com.sample.trelloclone.entity.Column;
 import com.sample.trelloclone.entity.Label;
+import com.sample.trelloclone.mapper.BoardMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +20,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,13 +29,22 @@ public class BoardServiceTest {
     @Mock
     private MockDataService mockDataService;
 
+    @Mock
+    private BoardMapper boardMapper;
     @InjectMocks
     private BoardService boardService;
+
+    @BeforeEach
+    void init() {
+        lenient()
+                .when(boardMapper.toDto(any()))
+                .thenAnswer(i -> new BoardMapper().toDto((Board) i.getArguments()[0]));
+    }
 
     @Test
     public void get_board_when_no_board_configured() {
         // Given
-        when(mockDataService.getBoard()).thenReturn(null);
+        when(mockDataService.getBoard()).thenReturn(Optional.empty());
         // When
         Optional<BoardDto> boardDto = boardService.getBoard();
         // Then
@@ -72,14 +85,14 @@ public class BoardServiceTest {
                         )
                 )
                 .build();
-        when(mockDataService.getBoard()).thenReturn(Optional.of(Board.builder().name("test-board").build()));
+        when(mockDataService.getBoard()).thenReturn(Optional.of(board));
 
         // When
         BoardDto boardDto = boardService.getBoard().get();
 
         // Then
-        assertEquals(boardDto.getName(), "test-board");
-        assertEquals(boardDto.getColumns().size(), 3);
+        assertEquals("test-board", boardDto.getName());
+        assertEquals(3, boardDto.getColumns().size());
         assertTrue(boardDto
                 .getColumns()
                 .stream()
@@ -123,14 +136,14 @@ public class BoardServiceTest {
                         )
                 )
                 .build();
-        when(mockDataService.getBoard()).thenReturn(Optional.of(Board.builder().name("test-board").build()));
+        when(mockDataService.getBoard()).thenReturn(Optional.of(board));
 
         // When
         BoardDto boardDto = boardService.getBoard().get();
 
         // Then
-        assertEquals(boardDto.getName(), "test-board");
-        assertEquals(boardDto.getColumns().size(), 3);
+        assertEquals("test-board", boardDto.getName());
+        assertEquals(3, boardDto.getColumns().size());
         assertTrue(boardDto
                 .getColumns()
                 .stream()
@@ -139,21 +152,21 @@ public class BoardServiceTest {
         ColumnDto inProgress = boardDto
                 .getColumns()
                 .stream()
-                .filter(columnDto -> columnDto.getName().equals("in progress"))
+                .filter(columnDto -> columnDto.getName().equals("in-progress"))
                 .findAny()
                 .get();
-        assertEquals(inProgress.getCards().size(), 1);
+        assertEquals(1, inProgress.getCards().size());
         assertTrue(inProgress
                 .getCards()
                 .stream()
                 .allMatch(cardDto -> Objects.equals("Card-1", cardDto.getTitle()))
         );
-        assertEquals(inProgress
+        assertEquals(1, inProgress
                 .getCards()
                 .stream()
                 .findAny()
                 .get()
-                .getLabels().size(), 1);
+                .getLabels().size());
         assertTrue(inProgress
                 .getCards()
                 .stream()
