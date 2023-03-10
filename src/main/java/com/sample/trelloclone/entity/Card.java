@@ -10,7 +10,8 @@ import java.util.Set;
 @Data
 public class Card {
     private Integer id;
-    private String name;
+    private String title;
+    private String description;
     private Set<Label> labels;
     private User reportedBy;
     private User assignedTo;

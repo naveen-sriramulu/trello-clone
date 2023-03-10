@@ -9,7 +9,7 @@ import java.util.Set;
 @Builder
 @Data
 public class Board {
-    private Long id;
+    private Integer id;
     private String name;
     private Set<Column> columns;
     private Instant createdOn;

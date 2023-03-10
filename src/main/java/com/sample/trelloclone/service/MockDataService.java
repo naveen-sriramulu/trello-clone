@@ -5,20 +5,21 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class MockDataService {
 
-    Map<Integer, User> users = Map.of(
+    private Map<Integer, User> users = Map.of(
             1, User.builder().id(1).name("Naveen").lastActiveOn(Instant.parse("2023-03-10T10:20:00Z")).build(),
             2, User.builder().id(2).name("Arjun").lastActiveOn(Instant.parse("2023-03-10T06:37:42Z")).build(),
             3, User.builder().id(3).name("Senthil").lastActiveOn(Instant.parse("2023-03-10T13:34:51Z")).build(),
             4, User.builder().id(4).name("Kishore").lastActiveOn(Instant.parse("2023-03-10T12:19:26Z")).build()
     );
 
-    Map<Integer, Label> labels = Map.of(
+    private Map<Integer, Label> labels = Map.of(
             1, Label.builder().id(1).tag("ui").build(),
             2, Label.builder().id(2).tag("backend").build(),
             3, Label.builder().id(3).tag("MVP").build(),
@@ -26,77 +27,77 @@ public class MockDataService {
             5, Label.builder().id(5).tag("sprint-2").build()
     );
 
-    Map<Integer, Card> cards = Map.of(
+    private Map<Integer, Card> cards = Map.of(
             1, Card.builder()
                     .id(1)
-                    .name("Create Readme")
+                    .title("Create Readme")
                     .reportedBy(users.get(4))
                     .assignedTo(users.get(1))
                     .labels(Set.of(labels.get(3), labels.get(4)))
                     .build(),
             2, Card.builder()
                     .id(2)
-                    .name("Basic UI Design")
+                    .title("Basic UI Design")
                     .reportedBy(users.get(4))
                     .assignedTo(users.get(2))
                     .labels(Set.of(labels.get(1), labels.get(3), labels.get(4)))
                     .build(),
             3, Card.builder()
                     .id(3)
-                    .name("Design Login Screen")
+                    .title("Design Login Screen")
                     .reportedBy(users.get(3))
                     .assignedTo(users.get(2))
                     .labels(Set.of(labels.get(1), labels.get(3), labels.get(4)))
                     .build(),
             4, Card.builder()
                     .id(4)
-                    .name("Provide OAuth Security")
+                    .title("Provide OAuth Security")
                     .reportedBy(users.get(4))
                     .assignedTo(users.get(1))
                     .labels(Set.of(labels.get(2)))
                     .build(),
             5, Card.builder()
                     .id(5)
-                    .name("Role based authorization")
+                    .title("Role based authorization")
                     .reportedBy(users.get(3))
                     .assignedTo(users.get(1))
                     .labels(Set.of(labels.get(2)))
                     .build(),
             6, Card.builder()
                     .id(6)
-                    .name("Service to return the board as JSON")
+                    .title("Service to return the board as JSON")
                     .reportedBy(users.get(3))
                     .assignedTo(users.get(1))
                     .labels(Set.of(labels.get(1), labels.get(2)))
                     .build(),
             7, Card.builder()
                     .id(7)
-                    .name("API to return all cards containing a tag")
+                    .title("API to return all cards containing a tag")
                     .reportedBy(users.get(3))
                     .assignedTo(users.get(2))
                     .labels(Set.of(labels.get(2), labels.get(5)))
                     .build(),
             8, Card.builder()
                     .id(8)
-                    .name("Endpoint to return all cards of a column")
+                    .title("Endpoint to return all cards of a column")
                     .reportedBy(users.get(3))
                     .assignedTo(users.get(1))
                     .labels(Set.of(labels.get(2), labels.get(5)))
                     .build(),
             9, Card.builder()
                     .id(9)
-                    .name("REST API to return all cards created after a given timestamp")
+                    .title("REST API to return all cards created after a given timestamp")
                     .reportedBy(users.get(1))
                     .labels(Set.of(labels.get(2), labels.get(5)))
                     .build(),
             10, Card.builder()
                     .id(10)
-                    .name("Add menu item")
+                    .title("Add menu item")
                     .reportedBy(users.get(4))
                     .labels(Set.of(labels.get(1), labels.get(3)))
                     .build()
     );
-    Map<Integer, Column> columns = Map.of(
+    private Map<Integer, Column> columns = Map.of(
             1, Column.builder()
                     .id(1)
                     .name("in-progress")
@@ -122,9 +123,9 @@ public class MockDataService {
 //            7, Column.builder().id(7).name("closed").build()
     );
 
-    Set<Board> boards = Set.of(
+    private Set<Board> boards = Set.of(
             Board.builder()
-                    .id(1L)
+                    .id(1)
                     .name("Trello Clone")
                     .columns(columns
                             .values()
@@ -142,4 +143,8 @@ public class MockDataService {
 //                            .collect(Collectors.toSet()))
 //                    .build()
     );
+
+    public Optional<Board> getBoard() {
+        return boards.stream().findAny();
+    }
 }
