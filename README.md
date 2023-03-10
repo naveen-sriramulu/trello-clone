@@ -23,7 +23,7 @@ cd {{your_project}}
 ```
 
 ### Access the application
-Once the project is running, you can access the application by visiting http://localhost:8090 in your web browser.
+Once the project is running, you can access the application swagger API documentation by visiting http://localhost:8090/swagger-ui.html in your web browser.
 
 ### Features
 This application provides the following features:
