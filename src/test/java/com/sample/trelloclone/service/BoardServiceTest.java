@@ -7,8 +7,10 @@ import com.sample.trelloclone.entity.Card;
 import com.sample.trelloclone.entity.Column;
 import com.sample.trelloclone.entity.Label;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -18,9 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class BoardServiceTest {
-//    private BoardService boardService = new BoardService(new MockDataService());
-
     @Mock
     private MockDataService mockDataService;
 
