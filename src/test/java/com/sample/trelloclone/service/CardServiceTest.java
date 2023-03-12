@@ -15,6 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +44,7 @@ public class CardServiceTest {
                 .thenAnswer(i -> new BoardMapper().toDto((Board) i.getArguments()[0]));
     }
 
+    // Tests for cardService.getCardsByTag
     @Test
     public void get_cards_by_tag_matching_found() {
         // Given
@@ -140,6 +144,7 @@ public class CardServiceTest {
         );
     }
 
+    // Tests for cardService.getCardsByColumn
     @Test
     public void get_cards_by_column_found() {
         // Given
@@ -227,4 +232,88 @@ public class CardServiceTest {
         );
     }
 
+    // Tests for cardService.getCardsCreatedAfter
+    @Test
+    public void get_cards_created_after_found() {
+        // Given
+        when(mockDataService.getBoard()).thenReturn(new MockDataService().getBoard());
+        ZonedDateTime createdAfter = ZonedDateTime.ofInstant(Instant.parse("2023-03-10T23:32:46Z"), ZoneOffset.UTC);
+        // When
+        List<CardDto> cards = cardService.getCardsCreatedAfter(createdAfter);
+
+        // Then
+        assertFalse(CollectionUtils.isEmpty(cards));
+        assertEquals(2, cards.size());
+        assertTrue(cards
+                .stream()
+                .allMatch(card -> card.getCreatedOn().toEpochSecond() >= createdAfter.toEpochSecond())
+        );
+        assertTrue(cards
+                .stream()
+                .map(CardDto::getTitle)
+                .allMatch(title -> Set.of("Provide OAuth Security", "Role based authorization").contains(title))
+        );
+        assertTrue(cards.stream().allMatch(card -> StringUtils.isNotBlank(card.getColumn())));
+    }
+
+    @Test
+    public void get_cards_created_after_matching_date_equals() {
+        // Given
+        when(mockDataService.getBoard()).thenReturn(new MockDataService().getBoard());
+        ZonedDateTime createdAfter = ZonedDateTime.ofInstant(Instant.parse("2023-03-11T22:25:30Z"), ZoneOffset.UTC);
+        // When
+        List<CardDto> cards = cardService.getCardsCreatedAfter(createdAfter);
+
+        // Then
+        assertFalse(CollectionUtils.isEmpty(cards));
+        assertEquals(1, cards.size());
+        assertTrue(cards
+                .stream()
+                .allMatch(card -> card.getCreatedOn().equals(createdAfter))
+        );
+        assertTrue(cards
+                .stream()
+                .map(CardDto::getTitle)
+                .allMatch(title -> Set.of("Role based authorization").contains(title))
+        );
+        assertTrue(cards.stream().allMatch(card -> "test".equals(card.getColumn())));
+    }
+
+    @Test
+    public void get_cards_created_after_empty_cards_exception_when_null_is_passed() {
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsCreatedAfter(null)
+        );
+    }
+
+    @Test
+    public void get_cards_created_after_empty_cards_exception_when_no_board_configured() {
+        // Given
+        when(mockDataService.getBoard()).thenReturn(Optional.empty());
+        ZonedDateTime createdAfter = ZonedDateTime.ofInstant(Instant.parse("2023-03-10T23:32:46Z"), ZoneOffset.UTC);
+
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsCreatedAfter(createdAfter)
+        );
+    }
+
+    @Test
+    public void get_cards_created_after_exception_when_no_cards_found_after_the_date_passed() {
+        // Given
+        when(mockDataService.getBoard()).thenReturn(new MockDataService().getBoard());
+        ZonedDateTime createdAfter = ZonedDateTime.ofInstant(Instant.parse("2023-03-12T23:32:46Z"), ZoneOffset.UTC);
+
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsCreatedAfter(createdAfter)
+        );
+    }
 }

@@ -9,6 +9,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -77,6 +79,36 @@ public class CardControllerTest {
 
         // when
         ResultActions response = mockMvc.perform(get("/cards/column/no-column"));
+
+        // then
+        response.andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void get_cards_created_after_ok_response() throws Exception {
+        // Given
+        ZonedDateTime zonedDateTime = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS).withFixedOffsetZone();
+        when(cardService.getCardsCreatedAfter(zonedDateTime)).thenReturn(List.of(CardDto.builder()
+                .title("Create Readme")
+                .column("test-column")
+                .labels(Set.of("test-tag"))
+                .build()));
+
+        // when
+        ResultActions response = mockMvc.perform(get("/cards/createdAfter/%s".formatted(zonedDateTime.toString())));
+
+        // then
+        response.andExpect(status().isOk());
+    }
+
+    @Test
+    public void get_cards_created_after_no_content_response() throws Exception {
+        // Given
+        ZonedDateTime zonedDateTime = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS).withFixedOffsetZone();
+        when(cardService.getCardsCreatedAfter(zonedDateTime)).thenReturn(Collections.emptyList());
+
+        // when
+        ResultActions response = mockMvc.perform(get("/cards/createdAfter/%s".formatted(zonedDateTime.toString())));
 
         // then
         response.andExpect(status().isNoContent());
