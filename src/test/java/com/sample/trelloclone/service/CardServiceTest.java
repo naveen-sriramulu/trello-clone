@@ -50,7 +50,7 @@ public class CardServiceTest {
         List<CardDto> cards = cardService.getCardsByTag("MVP");
 
         // Then
-        assertTrue(CollectionUtils.isEmpty(cards));
+        assertFalse(CollectionUtils.isEmpty(cards));
         assertEquals(4, cards.size());
         assertTrue(cards
                 .stream()
@@ -60,7 +60,7 @@ public class CardServiceTest {
                 .map(CardDto::getTitle)
                 .allMatch(title -> Set.of("Create Readme", "Basic UI Design", "Design Login Screen", "Add menu item").contains(title))
         );
-        assertTrue(cards.stream().noneMatch(card -> StringUtils.isNotBlank(card.getColumn())));
+        assertTrue(cards.stream().allMatch(card -> StringUtils.isNotBlank(card.getColumn())));
     }
 
     @Test

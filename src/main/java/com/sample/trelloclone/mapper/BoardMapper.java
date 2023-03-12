@@ -52,6 +52,7 @@ public class BoardMapper {
                         .builder()
                         .title(card.getTitle())
                         .description(card.getDescription())
+                        .column(column.getName())
                         .assignedTo(card.getAssignedTo() != null
                                 ? card.getAssignedTo().getName() : null
                         )

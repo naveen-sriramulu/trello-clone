@@ -11,7 +11,7 @@ import java.util.Set;
 @Builder
 public class CardDto {
     private String title;
-//    private String column;
+    private String column;
     private String description;
     private Set<String> labels;
     private String assignedTo;
