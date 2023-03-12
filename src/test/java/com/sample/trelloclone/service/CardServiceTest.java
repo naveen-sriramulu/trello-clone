@@ -140,5 +140,91 @@ public class CardServiceTest {
         );
     }
 
+    @Test
+    public void get_cards_by_column_found() {
+        // Given
+        when(mockDataService.getBoard()).thenReturn(new MockDataService().getBoard());
+
+        // When
+        List<CardDto> cards = cardService.getCardsByColumn("review");
+
+        // Then
+        assertFalse(CollectionUtils.isEmpty(cards));
+        assertEquals(3, cards.size());
+        assertTrue(cards
+                .stream()
+                .allMatch(card -> card.getColumn().equals("review")));
+        assertTrue(cards
+                .stream()
+                .map(CardDto::getTitle)
+                .allMatch(title -> Set.of("Create Readme", "Basic UI Design", "API to return all cards containing a tag").contains(title))
+        );
+    }
+
+    @Test
+    public void get_cards_by_column_empty_cards_exception_when_empty_column_search() {
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsByColumn("")
+        );
+
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsByColumn(" ")
+        );
+
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsByColumn(null)
+        );
+    }
+
+    @Test
+    public void get_cards_by_column_empty_cards_exception_when_no_board_configured() {
+        // Given
+        when(mockDataService.getBoard()).thenReturn(Optional.empty());
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsByColumn("test")
+        );
+    }
+
+    @Test
+    public void get_cards_by_column_empty_cards_exception_when_board_has_empty_columns() {
+        // Given
+        Board board = Board.builder()
+                .id(1)
+                .name("test-board")
+                .columns(Set.of())
+                .build();
+        when(mockDataService.getBoard()).thenReturn(Optional.of(board));
+
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsByColumn("test")
+        );
+    }
+
+    @Test
+    public void get_cards_by_column_exception_when_no_matching_column_found() {
+        // Given
+        when(mockDataService.getBoard()).thenReturn(new MockDataService().getBoard());
+        assertThrows(
+                // Then
+                EmptyCardsException.class,
+                // When
+                () -> cardService.getCardsByColumn("test-column")
+        );
+    }
 
 }

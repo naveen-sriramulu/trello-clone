@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 
@@ -26,15 +24,7 @@ public class CardService {
     }
 
     public List<CardDto> getCardsByTag(String tag) {
-        if (StringUtils.isBlank(tag)) {
-            throw new EmptyCardsException();
-        }
-        Optional<Board> board = dataService
-                .getBoard();
-        if (board.isEmpty()) {
-            throw new EmptyCardsException();
-        }
-        List<CardDto> cards = boardMapper.toDto(board.get())
+        List<CardDto> cards = boardMapper.toDto(getBoard(tag))
                 .getColumns()
                 .stream()
                 .flatMap(columnDto -> columnDto.getCards().stream())
@@ -45,5 +35,29 @@ public class CardService {
             throw new EmptyCardsException();
         }
         return cards;
+    }
+
+    public List<CardDto> getCardsByColumn(String column) {
+        List<CardDto> cards = boardMapper.toDto(getBoard(column))
+                .getColumns()
+                .stream()
+                .filter(columnDto -> columnDto.getName().equals(column))
+                .findFirst()
+                .orElseThrow(EmptyCardsException::new)
+                .getCards()
+                .stream()
+                .toList();
+
+        if (CollectionUtils.isEmpty(cards)) {
+            throw new EmptyCardsException();
+        }
+        return cards;
+    }
+
+    private Board getBoard(String tag) {
+        if (StringUtils.isBlank(tag)) {
+            throw new EmptyCardsException();
+        }
+        return dataService.getBoard().orElseThrow(EmptyCardsException::new);
     }
 }

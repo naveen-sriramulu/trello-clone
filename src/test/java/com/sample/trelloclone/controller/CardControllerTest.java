@@ -1,8 +1,6 @@
 package com.sample.trelloclone.controller;
 
-import com.sample.trelloclone.dto.BoardDto;
 import com.sample.trelloclone.dto.CardDto;
-import com.sample.trelloclone.entity.Card;
 import com.sample.trelloclone.service.CardService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.Mockito.when;
@@ -30,7 +27,7 @@ public class CardControllerTest {
     private CardService cardService;
 
     @Test
-    public void get_board_ok_response() throws Exception {
+    public void get_cards_by_tag_ok_response() throws Exception {
         // Given
         when(cardService.getCardsByTag("test-tag")).thenReturn(List.of(CardDto.builder()
                 .title("Create Readme")
@@ -46,7 +43,7 @@ public class CardControllerTest {
     }
 
     @Test
-    public void get_board_no_content_response() throws Exception {
+    public void get_cards_by_tag_no_content_response() throws Exception {
         // Given
         when(cardService.getCardsByTag("no-tag")).thenReturn(Collections.emptyList());
 
@@ -57,4 +54,31 @@ public class CardControllerTest {
         response.andExpect(status().isNoContent());
     }
 
+    @Test
+    public void get_cards_by_column_ok_response() throws Exception {
+        // Given
+        when(cardService.getCardsByColumn("test-column")).thenReturn(List.of(CardDto.builder()
+                .title("Create Readme")
+                .column("test-column")
+                .labels(Set.of("test-tag"))
+                .build()));
+
+        // when
+        ResultActions response = mockMvc.perform(get("/cards/column/test-column"));
+
+        // then
+        response.andExpect(status().isOk());
+    }
+
+    @Test
+    public void get_cards_by_column_no_content_response() throws Exception {
+        // Given
+        when(cardService.getCardsByColumn("no-column")).thenReturn(Collections.emptyList());
+
+        // when
+        ResultActions response = mockMvc.perform(get("/cards/column/no-column"));
+
+        // then
+        response.andExpect(status().isNoContent());
+    }
 }
