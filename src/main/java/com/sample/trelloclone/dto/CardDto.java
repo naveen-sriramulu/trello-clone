@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Getter
@@ -16,6 +17,6 @@ public class CardDto {
     private Set<String> labels;
     private String assignedTo;
     private String reportedBy;
-    private String createdOn;
-    private String updatedOn;
+    private ZonedDateTime createdOn;
+    private ZonedDateTime updatedOn;
 }

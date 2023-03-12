@@ -9,6 +9,8 @@ import com.sample.trelloclone.entity.Column;
 import com.sample.trelloclone.entity.Label;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -59,8 +61,8 @@ public class BoardMapper {
                         .reportedBy(card.getReportedBy() != null
                                 ? card.getReportedBy().getName() : null
                         )
-                        .labels(getLabels(card)
-                        )
+                        .createdOn(card.getCreatedOn()!=null ? ZonedDateTime.ofInstant(card.getCreatedOn(), ZoneOffset.UTC) : null)
+                        .labels(getLabels(card))
                         .build()
                 )
                 .collect(Collectors.toSet());
