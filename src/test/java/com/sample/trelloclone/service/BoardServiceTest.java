@@ -3,9 +3,8 @@ package com.sample.trelloclone.service;
 import com.sample.trelloclone.dto.BoardDto;
 import com.sample.trelloclone.dto.ColumnDto;
 import com.sample.trelloclone.entity.Board;
-import com.sample.trelloclone.entity.Card;
 import com.sample.trelloclone.entity.Column;
-import com.sample.trelloclone.entity.Label;
+import com.sample.trelloclone.exception.BoardNotFoundException;
 import com.sample.trelloclone.mapper.BoardMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,12 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
@@ -42,38 +39,7 @@ public class BoardServiceTest {
     }
 
     @Test
-    public void get_board_when_no_board_configured() {
-        // Given
-        when(mockDataService.getBoard()).thenReturn(Optional.empty());
-        // When
-        Optional<BoardDto> boardDto = boardService.getBoard();
-        // Then
-        assertTrue(boardDto.isEmpty());
-
-        // Given
-        when(mockDataService.getBoard()).thenReturn(Optional.empty());
-        // When
-        boardDto = boardService.getBoard();
-        // Then
-        assertTrue(boardDto.isEmpty());
-
-    }
-
-    @Test
-    public void get_board_when_board_is_configured_with_no_columns() {
-        // Given
-        when(mockDataService.getBoard()).thenReturn(Optional.of(Board.builder().name("test-board").build()));
-
-        // When
-        BoardDto boardDto = boardService.getBoard().get();
-
-        // Then
-        assertTrue(boardDto.getName().equals("test-board"));
-        assertTrue(boardDto.getColumns().isEmpty());
-    }
-
-    @Test
-    public void get_board_when_board_is_configured_with_columns_and_no_cards() {
+    public void get_board_when_board_is_configured() {
         // Given
         Board board = Board.builder()
                 .id(1)
@@ -102,77 +68,27 @@ public class BoardServiceTest {
     }
 
     @Test
-    public void get_board_when_board_is_configured_with_columns_and_cards() {
+    public void board_not_found_exception_when_no_board_configured() {
         // Given
-        Board board = Board.builder()
-                .id(1)
-                .name("test-board")
-                .columns(Set.of(
-                                Column.builder()
-                                        .id(1)
-                                        .name("in-progress")
-                                        .cards(Set.of(Card.builder()
-                                                .id(1)
-                                                .title("Card-1")
-                                                .labels(Set.of(Label.builder().tag("l1").build()))
-                                                .build())
-                                        )
-                                        .build(),
-                                Column.builder()
-                                        .id(1)
-                                        .name("dev")
-                                        .cards(Set.of(Card.builder()
-                                                        .id(1)
-                                                        .title("Card-2")
-                                                        .labels(Set.of(Label.builder().tag("l1").build(), Label.builder().tag("l2").build()))
-                                                        .build(),
-                                                Card.builder()
-                                                        .id(1)
-                                                        .title("Card-3")
-                                                        .build()
-                                        ))
-                                        .build(),
-                                Column.builder().id(1).name("done").build()
-                        )
-                )
-                .build();
-        when(mockDataService.getBoard()).thenReturn(Optional.of(board));
-
-        // When
-        BoardDto boardDto = boardService.getBoard().get();
-
-        // Then
-        assertEquals("test-board", boardDto.getName());
-        assertEquals(3, boardDto.getColumns().size());
-        assertTrue(boardDto
-                .getColumns()
-                .stream()
-                .allMatch(columnDto -> Set.of("in-progress", "dev", "done").contains(columnDto.getName()))
+        when(mockDataService.getBoard()).thenReturn(Optional.empty());
+        assertThrows(
+                // Then
+                BoardNotFoundException.class,
+                // When
+                () -> boardService.getBoard()
         );
-        ColumnDto inProgress = boardDto
-                .getColumns()
-                .stream()
-                .filter(columnDto -> columnDto.getName().equals("in-progress"))
-                .findAny()
-                .get();
-        assertEquals(1, inProgress.getCards().size());
-        assertTrue(inProgress
-                .getCards()
-                .stream()
-                .allMatch(cardDto -> Objects.equals("Card-1", cardDto.getTitle()))
+
+
+        // Given
+        when(mockDataService.getBoard()).thenReturn(Optional.empty());
+        assertThrows(
+                // Then
+                BoardNotFoundException.class,
+                // When
+                () -> boardService.getBoard()
         );
-        assertEquals(1, inProgress
-                .getCards()
-                .stream()
-                .findAny()
-                .get()
-                .getLabels().size());
-        assertTrue(inProgress
-                .getCards()
-                .stream()
-                .findAny()
-                .get()
-                .getLabels()
-                .contains("l1"));
+
     }
+
+
 }
