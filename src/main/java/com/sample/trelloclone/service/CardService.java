@@ -11,7 +11,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 
@@ -45,5 +44,9 @@ public class CardService {
             throw new EmptyCardsException();
         }
         return cards;
+    }
+
+    public List<CardDto> getCardsByColumn(String column) {
+        return null;
     }
 }
