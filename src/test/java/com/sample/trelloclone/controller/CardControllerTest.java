@@ -57,7 +57,7 @@ public class CardControllerTest {
     @Test
     public void get_cards_by_column_ok_response() throws Exception {
         // Given
-        when(cardService.getCardsByTag("test-column")).thenReturn(List.of(CardDto.builder()
+        when(cardService.getCardsByColumn("test-column")).thenReturn(List.of(CardDto.builder()
                 .title("Create Readme")
                 .column("test-column")
                 .labels(Set.of("test-tag"))
@@ -73,7 +73,7 @@ public class CardControllerTest {
     @Test
     public void get_cards_by_column_no_content_response() throws Exception {
         // Given
-        when(cardService.getCardsByTag("no-column")).thenReturn(Collections.emptyList());
+        when(cardService.getCardsByColumn("no-column")).thenReturn(Collections.emptyList());
 
         // when
         ResultActions response = mockMvc.perform(get("/cards/column/no-column"));

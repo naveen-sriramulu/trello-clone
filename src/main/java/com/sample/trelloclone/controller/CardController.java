@@ -37,11 +37,28 @@ public class CardController {
             @ApiResponse(responseCode = "204", description = "No content",
                     content = @Content)
     })
-    public ResponseEntity<List<CardDto>> getCardsByTag(@PathVariable(required = true) String tag) {
+    public ResponseEntity<List<CardDto>> getCardsByTag(@PathVariable String tag) {
         List<CardDto> cardsByTag = cardService.getCardsByTag(tag);
         if (CollectionUtils.isEmpty(cardsByTag)) {
             throw new EmptyCardsException();
         }
         return ResponseEntity.ok(cardsByTag);
+    }
+
+    @GetMapping("/column/{column}")
+    @Operation(summary = "Get cards by column")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return the matching cards",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = CardDto.class))}),
+            @ApiResponse(responseCode = "204", description = "No content",
+                    content = @Content)
+    })
+    public ResponseEntity<List<CardDto>> getCardsByColumn(@PathVariable String column) {
+        List<CardDto> cardsByColumn = cardService.getCardsByColumn(column);
+        if (CollectionUtils.isEmpty(cardsByColumn)) {
+            throw new EmptyCardsException();
+        }
+        return ResponseEntity.ok(cardsByColumn);
     }
 }

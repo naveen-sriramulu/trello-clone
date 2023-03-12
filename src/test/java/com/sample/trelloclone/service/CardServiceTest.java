@@ -223,7 +223,7 @@ public class CardServiceTest {
                 // Then
                 EmptyCardsException.class,
                 // When
-                () -> cardService.getCardsByColumn("test")
+                () -> cardService.getCardsByColumn("test-column")
         );
     }
 
