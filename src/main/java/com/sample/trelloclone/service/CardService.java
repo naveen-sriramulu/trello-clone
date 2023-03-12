@@ -65,7 +65,24 @@ public class CardService {
     }
 
     public List<CardDto> getCardsCreatedAfter(ZonedDateTime createdAfter) {
-        return null;
+        if (createdAfter == null) {
+            throw new EmptyCardsException();
+        }
+        List<CardDto> cards = boardMapper
+                .toDto(dataService
+                        .getBoard()
+                        .orElseThrow(EmptyCardsException::new)
+                )
+                .getColumns()
+                .stream()
+                .flatMap(columnDto -> columnDto.getCards().stream())
+                .filter(cardDto -> cardDto.getCreatedOn().toEpochSecond() >= createdAfter.toEpochSecond())
+                .toList();
+
+        if (CollectionUtils.isEmpty(cards)) {
+            throw new EmptyCardsException();
+        }
+        return cards;
     }
 
     private void validate(String keyword) {
