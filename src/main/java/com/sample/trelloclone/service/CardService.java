@@ -2,13 +2,13 @@ package com.sample.trelloclone.service;
 
 
 import com.sample.trelloclone.dto.CardDto;
-import com.sample.trelloclone.entity.Board;
 import com.sample.trelloclone.exception.EmptyCardsException;
 import com.sample.trelloclone.mapper.BoardMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -24,7 +24,12 @@ public class CardService {
     }
 
     public List<CardDto> getCardsByTag(String tag) {
-        List<CardDto> cards = boardMapper.toDto(getBoard(tag))
+        validate(tag);
+        List<CardDto> cards = boardMapper
+                .toDto(dataService
+                        .getBoard()
+                        .orElseThrow(EmptyCardsException::new)
+                )
                 .getColumns()
                 .stream()
                 .flatMap(columnDto -> columnDto.getCards().stream())
@@ -38,7 +43,12 @@ public class CardService {
     }
 
     public List<CardDto> getCardsByColumn(String column) {
-        List<CardDto> cards = boardMapper.toDto(getBoard(column))
+        validate(column);
+        List<CardDto> cards = boardMapper
+                .toDto(dataService
+                        .getBoard()
+                        .orElseThrow(EmptyCardsException::new)
+                )
                 .getColumns()
                 .stream()
                 .filter(columnDto -> columnDto.getName().equals(column))
@@ -54,10 +64,13 @@ public class CardService {
         return cards;
     }
 
-    private Board getBoard(String tag) {
-        if (StringUtils.isBlank(tag)) {
+    public List<CardDto> getCardsCreatedAfter(ZonedDateTime createdAfter) {
+        return null;
+    }
+
+    private void validate(String keyword) {
+        if (StringUtils.isBlank(keyword)) {
             throw new EmptyCardsException();
         }
-        return dataService.getBoard().orElseThrow(EmptyCardsException::new);
     }
 }
