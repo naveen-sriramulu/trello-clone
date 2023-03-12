@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
 
-    @ExceptionHandler(BoardNotFoundException.class)
+    @ExceptionHandler({BoardNotFoundException.class, EmptyCardsException.class})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<String> handleBoardNotFound(RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NO_CONTENT);
